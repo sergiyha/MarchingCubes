@@ -1,6 +1,7 @@
 ﻿
 using System;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -27,13 +28,13 @@ public class MarchingCubes : MonoBehaviour
 	private void Start()
 	{
 		_triangles = new List<Triangle>();
-		InitPoints();
+		InitPointsForSphere();
 		InitCubes();
 		MarchCubes();
 		CombineTris();
 	}
 
-	private void InitPoints()
+	private void InitPointsForSphere()
 	{
 		_points = new Vector4[_size.x * _size.y * _size.z];
 		_cubes = new Cube[_size.x * _size.y * _size.z];
@@ -50,20 +51,13 @@ public class MarchingCubes : MonoBehaviour
 					int index = IndxFromCoord(x, y, z);
 					var currPoint = new Vector3(x * _cellSize, y * _cellSize, z * _cellSize);
 					var w = 1 - Vector3.Distance(middlePoint, currPoint) / maxLength;
-					_points[index] = new Vector4(x * _cellSize, y * _cellSize, z * _cellSize, w);
-
+					_points[index] = new Vector4(currPoint.x, currPoint.y, currPoint.z, w);
 				}
 			}
 		}
-
-		AdditionalSetting();
 	}
 
-	private void AdditionalSetting()
-	{
-		var value = _points[13];
-		_points[13] = new Vector4(value.x, value.y, value.z, 0.5f);
-	}
+
 
 	private void OnDrawGizmos()
 	{
@@ -81,6 +75,7 @@ public class MarchingCubes : MonoBehaviour
 					if (IsoLevel < _points[index].w) continue;
 					Gizmos.color = new Color(point.w, point.w, point.w);
 					Gizmos.DrawCube(point, new Vector3(0.1f, 0.1f, 0.1f));
+					//Handles.Label(point, $"X:{x} Y:{y} Z:{z} W:{_points[index].w}");
 				}
 			}
 		}
